@@ -1,0 +1,129 @@
+---
+title: "Text Clustering using K-Means"
+author: "HARSHITHA MEKALA"
+date: "25 May 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading the input file
+```{r}
+comments <- read.csv("C:/Users/Administrator/Downloads/saidatasets/Comments.csv")
+corpus
+View(comments)
+head(comments)
+```
+
+## loading libraries
+```{r}
+library("tm")
+```
+
+## Convert into text corpus
+```{r}
+comments1 <- Corpus(VectorSource(comments$Feedback))
+comments1
+inspect(comments1)
+#View(comments1)
+typeof(comments1)
+```
+
+## convert to lower-case
+```{r}
+comments1[[1]]
+comments1[[83]]
+comments2 <- tm_map(comments1,tolower)
+inspect(comments2)
+```
+
+## Remove stop words
+```{r}
+comments2[[83]]
+comments3 <- tm_map(comments2,removeWords,stopwords("english"))
+comments3[[83]]
+inspect(comments3[[83]])
+```
+
+## Remove the punctuations
+```{r}
+comments4 <- tm_map(comments3, removePunctuation)
+inspect(comments4[[83]])
+```
+
+## Remove the numbers
+```{r}
+comments5 <- tm_map(comments4, removeNumbers)
+inspect(comments5[[83]])
+```
+
+## Eliminating Extra White Space
+```{r}
+comments6 <- tm_map(comments5, stripWhitespace)
+inspect(comments6[[83]])
+```
+
+## Create a term Document Matrix
+```{r}
+dtm <- DocumentTermMatrix(comments6)
+dtm
+inspect(dtm[1:5,1:10])
+inspect(dtm[10,])
+```
+
+## Finding the frequent terms
+```{r}
+findFreqTerms(dtm,10)
+findFreqTerms(dtm,5)
+```
+
+##do tfxidf
+```{r}
+dtm_tfxidf <- weightTfIdf(dtm)
+inspect(dtm_tfxidf[1:5,1:100])
+```
+
+## do document clustering
+## k-Means(this uses euclidean distance)
+```{r}
+m = as.matrix(dtm_tfxidf)
+View(m)
+rownames(m) <- 1:nrow(m)
+```
+
+## normalize the vector so that Euclidean makes sense
+```{r}
+norm_eucl <- function(m) m/apply(m,MARGIN = 1, FUN = function(x) sum(x^2)^.5)
+m_norm <- norm_eucl
+```
+
+```{r}
+m_norm1 <- m_norm[-27,]
+```
+
+## cluster into 4 clusters
+```{r}
+cl <- kmeans(m_norm,4)
+cl
+```
+
+```{r}
+cl$cluster
+cl$size
+table(cl$cluster,cl$size)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
